@@ -8,6 +8,7 @@ import (
 )
 
 type Inverter struct {
+	BaseHandler
 	log hclog.Logger
 }
 
@@ -16,15 +17,10 @@ func NewInverter(log hclog.Logger) *Inverter {
 }
 
 func (t *Inverter) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	file, _, err := r.FormFile("file")
+	rw.Header().Add("Content-Type", "text/plain")
+	records, err := t.getFieldFromForm(t.log, r)
 	if err != nil {
-		rw.Write([]byte(fmt.Sprintf("error %s", err.Error())))
-		return
-	}
-	defer file.Close()
-	records, err := csv.NewReader(file).ReadAll()
-	if err != nil {
-		rw.Write([]byte(fmt.Sprintf("error %s", err.Error())))
+		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
 	var response string

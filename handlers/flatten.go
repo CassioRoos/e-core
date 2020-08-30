@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/csv"
 	"fmt"
 	"github.com/hashicorp/go-hclog"
 	"net/http"
@@ -9,6 +8,7 @@ import (
 )
 
 type Flatten struct {
+	BaseHandler
 	log hclog.Logger
 }
 
@@ -16,17 +16,11 @@ func NewFlatten(log hclog.Logger) *Flatten {
 	return &Flatten{log: log}
 }
 
-func (e *Flatten) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	//http.HandleFunc("/echo", func(w http.ResponseWriter, r *http.Request) {
-	file, _, err := r.FormFile("file")
+func (f *Flatten) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	rw.Header().Add("Content-Type", "text/plain")
+	records, err := f.getFieldFromForm(f.log, r)
 	if err != nil {
-		w.Write([]byte(fmt.Sprintf("error %s", err.Error())))
-		return
-	}
-	defer file.Close()
-	records, err := csv.NewReader(file).ReadAll()
-	if err != nil {
-		w.Write([]byte(fmt.Sprintf("error %s", err.Error())))
+		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
 	var response string
@@ -34,5 +28,5 @@ func (e *Flatten) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		response = fmt.Sprintf("%s%s,", response, strings.Join(row, ","))
 	}
 	response = response[:len(response)-1]
-	fmt.Fprint(w, response)
+	fmt.Fprint(rw, response)
 }

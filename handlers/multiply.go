@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/csv"
 	"fmt"
 	"github.com/hashicorp/go-hclog"
 	"net/http"
@@ -10,6 +9,7 @@ import (
 )
 
 type Multiply struct {
+	BaseHandler
 	log hclog.Logger
 }
 
@@ -17,16 +17,11 @@ func NewMultiply(log hclog.Logger) *Multiply {
 	return &Multiply{log: log}
 }
 
-func (s *Multiply) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	file, _, err := r.FormFile("file")
+func (m *Multiply) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	rw.Header().Add("Content-Type", "text/plain")
+	records, err := m.getFieldFromForm(m.log, r)
 	if err != nil {
-		rw.Write([]byte(fmt.Sprintf("error %s", err.Error())))
-		return
-	}
-	defer file.Close()
-	records, err := csv.NewReader(file).ReadAll()
-	if err != nil {
-		rw.Write([]byte(fmt.Sprintf("error %s", err.Error())))
+		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
 	var response float64 = 1
@@ -34,12 +29,12 @@ func (s *Multiply) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		for _, ss := range row {
 			i, err := strconv.ParseFloat(ss, 64)
 			if err != nil {
-				s.log.Error("Error converting integer, this should not happen", "value", ss)
+				m.log.Error("Error converting integer, this should not happen", "value", ss)
 				os.Exit(1)
 			}
 			response *= i
 		}
-		//response = fmt.Sprintf("%s%s\n", response, strings.Join(row, ","))
+		//response = fmt.Sprintf("%m%m\n", response, strings.Join(row, ","))
 	}
 	fmt.Fprint(rw, response)
 }

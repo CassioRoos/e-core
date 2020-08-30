@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/csv"
 	"fmt"
 	"github.com/hashicorp/go-hclog"
 	"net/http"
@@ -9,7 +8,9 @@ import (
 )
 
 type Echo struct {
+	BaseHandler
 	log hclog.Logger
+
 }
 
 func NewEcho(log hclog.Logger) *Echo {
@@ -17,21 +18,17 @@ func NewEcho(log hclog.Logger) *Echo {
 }
 
 func (e *Echo) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	file, _, err := r.FormFile("file")
+	rw.Header().Add("Content-Type", "text/plain")
+	records, err := e.getFieldFromForm(e.log, r)
 	if err != nil {
-		rw.Write([]byte(fmt.Sprintf("error %s", err.Error())))
+		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
-	defer file.Close()
-	records, err := csv.NewReader(file).ReadAll()
-	if err != nil {
-		rw.Write([]byte(fmt.Sprintf("error %s", err.Error())))
-		return
-	}
-	rw.Header().Set("Content-Type", "text/plain")
 	var response string
 	for _, row := range records {
 		response = fmt.Sprintf("%s%s\n", response, strings.Join(row, ","))
 	}
+	e.log.Debug("Echo handler success", "message", response)
+	rw.WriteHeader(http.StatusOK)
 	fmt.Fprint(rw, response)
 }
