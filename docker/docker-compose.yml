@@ -1,0 +1,11 @@
+version: '3.0'
+services:
+  e_core:
+    container_name: e_core
+    restart: unless-stopped
+    build:
+      context: ./..
+    ports:
+      - 8080:8080
+    environment:
+      - PORT:${PORT:-":8080"}

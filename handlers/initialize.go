@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/CassioRoos/e-core/services"
 	"github.com/hashicorp/go-hclog"
 	"net/http"
 )
@@ -16,18 +17,25 @@ var log = hclog.New(&hclog.LoggerOptions{
 })
 
 func init() {
-	echo := NewEcho(log)
-	sum := NewSum(log)
-	multiply := NewMultiply(log)
-	flatten := NewFlatten(log)
-	inverter := NewInverter(log)
+	echoService := services.NewEchoService()
+	sumService := services.NewSumService()
+	flattenService := services.NewFlattenService()
+	multiplyService := services.NewMultiplyService()
+	invertService := services.NewInvertService()
+
+	echo := NewEcho(log, echoService)
+	sum := NewSum(log,sumService)
+	flatten := NewFlatten(log, flattenService)
+	multiply := NewMultiply(log,multiplyService)
+
+    invert := NewInvert(log, invertService)
 	healthCheck := NewHealthCheck(log)
 
 	ServerMux.Handle("/echo", echo)
 	ServerMux.Handle("/sum", sum)
 	ServerMux.Handle("/multiply", multiply)
 	ServerMux.Handle("/flatten", flatten)
-	ServerMux.Handle("/inverter", inverter)
+	ServerMux.Handle("/invert", invert)
 	ServerMux.Handle("/healthcheck", healthCheck)
 
 }

@@ -25,9 +25,7 @@ func main() {
 		TimeFormat: "02/01/2006 15:04:05",
 	})
 
-	//sm.HandleFunc("/", func (rw http.ResponseWriter, r *http.Request) {
-	//	fmt.Fprintf(rw,"Hello" )
-	//})
+
 	server := http.Server{
 		Addr:         *port,              // configure the bind address
 		Handler:      handlers.ServerMux, // set the default handler

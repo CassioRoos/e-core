@@ -1,36 +1,30 @@
 package handlers
 
 import (
-	"encoding/csv"
 	"fmt"
+	"github.com/CassioRoos/e-core/services"
 	"github.com/hashicorp/go-hclog"
 	"net/http"
 )
 
-type Inverter struct {
+type Invert struct {
 	BaseHandler
-	log hclog.Logger
+	log     hclog.Logger
+	service services.InvertService
 }
 
-func NewInverter(log hclog.Logger) *Inverter {
-	return &Inverter{log: log}
+func NewInvert(log hclog.Logger, service services.InvertService) *Invert {
+	return &Invert{log: log, service: service}
 }
 
-func (t *Inverter) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (t *Invert) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Add("Content-Type", "text/plain")
-	records, err := t.getFieldFromForm(t.log, r)
+	records, err := t.getFieldFromForm("file", t.log, r)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
-	var response string
-	for i := 0; i < len(records); i++ {
-		line := ""
-		for j := 0; j < len(records); j++ {
-			line += records[j][i] + ","
-		}
-		line = line[:len(line)-1]
-		response += line + "\n"
-	}
+	response := t.service.GetInvert(records)
+	t.log.Debug("Echo invert success", "message", response)
 	fmt.Fprint(rw, response)
 }

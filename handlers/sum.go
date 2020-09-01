@@ -1,40 +1,35 @@
 package handlers
 
 import (
-	"encoding/csv"
 	"fmt"
+	"github.com/CassioRoos/e-core/services"
 	"github.com/hashicorp/go-hclog"
 	"net/http"
-	"os"
-	"strconv"
 )
 
 type Sum struct {
 	BaseHandler
-	log hclog.Logger
+	service services.SumService
+	log     hclog.Logger
 }
 
-func NewSum(log hclog.Logger) *Sum {
-	return &Sum{log: log}
+func NewSum(log hclog.Logger, service services.SumService) *Sum {
+	return &Sum{log: log, service: service}
 }
 
 func (s *Sum) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Add("Content-Type", "text/plain")
-	records, err := s.getFieldFromForm(s.log, r)
+	records, err := s.getFieldFromForm("file", s.log, r)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
-	var response int
-	for _, row := range records {
-		for _, value := range row {
-			i, err := strconv.Atoi(value)
-			if err != nil {
-				s.log.Error("Error converting integer, this should not happen", "value", ss)
-				os.Exit(1)
-			}
-			response += i
-		}
+	response, err := s.service.GetSum(records)
+	if err != nil {
+		s.log.Error("Error getting the sum from service", "error", err)
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
 	}
+	s.log.Debug("Echo sum success", "message", response)
 	fmt.Fprint(rw, response)
 }

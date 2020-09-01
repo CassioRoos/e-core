@@ -17,7 +17,7 @@ if [ $exit_status -ne 0 ]; then
 fi
 
 if [ $exit_status -eq 0 ]; then
-    TEST_ENV=local go test -mod=vendor -v -race -failfast ./tests
+    go test -mod=vendor -v -race -failfast ./tests
     ret=$?
 fi
 exit $ret

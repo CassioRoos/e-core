@@ -25,6 +25,26 @@ func csvfile(filename string) io.Reader{
 	return file
 }
 
+func Test_Error_WrongField(t *testing.T) {
+	apiClient.Get("/echo").
+		File("filee", csvfile("echo")).
+		Expect(t).
+		Status(http.StatusBadRequest).
+		Type("text/plain").
+		BodyEquals("http: no such file").
+		Done()
+}
+
+func Test_Error_Malformed(t *testing.T) {
+	apiClient.Get("/echo").
+		File("file", csvfile("malformed")).
+		Expect(t).
+		Status(http.StatusBadRequest).
+		Type("text/plain").
+		BodyEquals("record on line 2: wrong number of fields").
+		Done()
+}
+
 func Test_Echo(t *testing.T) {
 	apiClient.Get("/echo").
 		File("file", csvfile("echo")).
@@ -44,6 +64,7 @@ func Test_Flatten(t *testing.T) {
 		BodyEquals("9,8,7,6,5,4,3,2,1").
 		Done()
 }
+
 func Test_Sum(t *testing.T) {
 	apiClient.Get("/sum").
 		File("file", csvfile("sum")).
@@ -53,9 +74,20 @@ func Test_Sum(t *testing.T) {
 		BodyEquals("210").
 		Done()
 }
-func Test_Inverter(t *testing.T) {
-	apiClient.Get("/inverter").
-		File("file", csvfile("inverter")).
+
+func Test_Error_Sum(t *testing.T) {
+	apiClient.Get("/sum").
+		File("file", csvfile("error")).
+		Expect(t).
+		Status(http.StatusInternalServerError).
+		Type("text/plain").
+		BodyEquals("Error converting A to integer").
+		Done()
+}
+
+func Test_Invert(t *testing.T) {
+	apiClient.Get("/invert").
+		File("file", csvfile("invert")).
 		Expect(t).
 		Status(http.StatusOK).
 		Type("text/plain").
@@ -79,5 +111,15 @@ func Test_Multiply(t *testing.T) {
 		Status(http.StatusOK).
 		Type("text/plain").
 		BodyEquals("725760").
+		Done()
+}
+
+func Test_Error_Multiply(t *testing.T) {
+	apiClient.Get("/multiply").
+		File("file", csvfile("error")).
+		Expect(t).
+		Status(http.StatusInternalServerError).
+		Type("text/plain").
+		BodyEquals("Error converting A to integer").
 		Done()
 }
