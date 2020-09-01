@@ -19,6 +19,7 @@ func getDefaultMatrix() [][]string {
 	return [][]string{{"1", "2", "3"}, {"4", "5", "6"}, {"7", "8", "9"}}
 }
 
+// the cases where math is involved are a bit more complex
 func getCasesNumber(values []int64) []CasesNumber {
 
 	return []CasesNumber{
@@ -62,6 +63,7 @@ func getCasesNumber(values []int64) []CasesNumber {
 	}
 }
 
+// the string cases are simple and have no errors
 func getCasesString(name []string, expected []string) []CasesString {
 	return []CasesString{
 		{

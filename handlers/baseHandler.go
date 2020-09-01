@@ -28,5 +28,6 @@ func (b *BaseHandler) getFieldFromForm(field string, log hclog.Logger, r *http.R
 		log.Error("Error while reading CSV file", "Error", err)
 		return nil, err
 	}
+	//return the matrix and no error
 	return records, nil
 }

@@ -12,11 +12,13 @@ import (
 var apiClient *baloo.Client
 
 func init() {
+	// environment vars to run e2e tests
 	host := os.Getenv("TEST_SERVER_HOST")
 	port := os.Getenv("PORT")
 	apiClient = baloo.New(fmt.Sprintf("%s%s", host, port))
 }
 
+// get the file as a io.reader
 func csvfile(filename string) io.Reader{
 	file, err := os.Open(fmt.Sprintf("../docker/e2e/data/%s.csv",filename))
 	if err != nil{

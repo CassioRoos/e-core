@@ -17,12 +17,12 @@ import (
 var port = env.String("PORT", false, ":8080", "Bind the application to a specific port")
 
 func main() {
+	// getting the env vars
 	env.Parse()
+	// Simple log config
 	var log = hclog.New(&hclog.LoggerOptions{
-		Name:       "e-core -> ",
+		Name:       "e-core - ",
 		Level:      hclog.LevelFromString("DEBUG"),
-		JSONFormat: true,
-		TimeFormat: "02/01/2006 15:04:05",
 	})
 
 
@@ -33,8 +33,7 @@ func main() {
 		WriteTimeout: 10 * time.Second,   // max time to write response to the client
 		IdleTimeout:  120 * time.Second,  // max time for connections using TCP Keep-Alive
 	}
-
+	// Showing the user the where is running and how to stop it
 	log.Info(fmt.Sprintf("Listening to port %s. Press CTRL + C to stop it.", *port))
 	server.ListenAndServe()
-	//http.ListenAndServe(*port, nil)
 }

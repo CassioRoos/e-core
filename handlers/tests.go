@@ -15,6 +15,7 @@ type requestObjecy struct {
 	Recorder *httptest.ResponseRecorder
 }
 
+// get the file as a io.reader
 func csvfile(filename string) io.Reader {
 	file, err := os.Open(fmt.Sprintf("data/%s.csv", filename))
 	if err != nil {
@@ -23,15 +24,21 @@ func csvfile(filename string) io.Reader {
 	return file
 }
 
+// return the object with the request test
 func getRequest(method, url, filename, field string) *requestObjecy{
 	var requestBody bytes.Buffer
+	// creates a multipar writer, we need to set the file to test properly
 	mpw := multipart.NewWriter(&requestBody)
+	// ensures that the file will close
 	defer mpw.Close()
+
+	// defines the name of the file
 	fw, err := mpw.CreateFormFile(field, fmt.Sprintf("%s.csv", filename))
 	if err != nil {
 		panic(err)
 	}
 
+	// copy the content to the file inside our request
 	_, err = io.Copy(fw, csvfile(filename))
 	if err != nil {
 		panic(err)
