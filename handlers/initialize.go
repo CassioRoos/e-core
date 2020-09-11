@@ -5,13 +5,13 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"net/http"
 )
+
 //Creates a serverMux to handle all requests
 var ServerMux = http.NewServeMux()
 
-
 var log = hclog.New(&hclog.LoggerOptions{
-	Name:       "e-core - ",
-	Level:      hclog.LevelFromString("DEBUG"),
+	Name:  "e-core - ",
+	Level: hclog.LevelFromString("DEBUG"),
 })
 
 func init() {
@@ -23,13 +23,12 @@ func init() {
 	invertService := services.NewInvertService()
 
 	// inject them into handlers
-	echo := NewEcho(log, echoService)
-	sum := NewSum(log,sumService)
-	flatten := NewFlatten(log, flattenService)
-	multiply := NewMultiply(log,multiplyService)
-    invert := NewInvert(log, invertService)
-	healthCheck := NewHealthCheck(log)
-
+	echo := MethodHttp(NewEcho(log, echoService))
+	sum := MethodHttp(NewSum(log, sumService))
+	flatten := MethodHttp(NewFlatten(log, flattenService))
+	multiply := MethodHttp(NewMultiply(log, multiplyService))
+	invert := MethodHttp(NewInvert(log, invertService))
+	healthCheck := MethodHttp(NewHealthCheck(log))
 	// defining the routes
 	ServerMux.Handle("/echo", echo)
 	ServerMux.Handle("/sum", sum)

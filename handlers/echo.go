@@ -8,7 +8,6 @@ import (
 )
 
 type Echo struct {
-	BaseHandler
 	service services.EchoService
 	log     hclog.Logger
 }
@@ -19,7 +18,7 @@ func NewEcho(log hclog.Logger, service services.EchoService) *Echo {
 
 func (e *Echo) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Add("Content-Type", "text/plain")
-	records, err := e.getFieldFromForm("file", e.log, r)
+	records, err := getFieldFromForm("file", e.log, r)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return

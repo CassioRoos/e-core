@@ -8,8 +8,6 @@ import (
 )
 
 type Flatten struct {
-	BaseHandler
-
 	log     hclog.Logger
 	service services.FlattenService
 }
@@ -20,7 +18,7 @@ func NewFlatten(log hclog.Logger, service services.FlattenService) *Flatten {
 
 func (f *Flatten) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Add("Content-Type", "text/plain")
-	records, err := f.getFieldFromForm("file", f.log, r)
+	records, err := getFieldFromForm("file", f.log, r)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return

@@ -19,16 +19,16 @@ func init() {
 }
 
 // get the file as a io.reader
-func csvfile(filename string) io.Reader{
-	file, err := os.Open(fmt.Sprintf("../docker/e2e/data/%s.csv",filename))
-	if err != nil{
+func csvfile(filename string) io.Reader {
+	file, err := os.Open(fmt.Sprintf("../docker/e2e/data/%s.csv", filename))
+	if err != nil {
 		panic(err)
 	}
 	return file
 }
 
 func Test_Error_WrongField(t *testing.T) {
-	apiClient.Get("/echo").
+	apiClient.Post("/echo").
 		File("filee", csvfile("echo")).
 		Expect(t).
 		Status(http.StatusBadRequest).
@@ -38,7 +38,7 @@ func Test_Error_WrongField(t *testing.T) {
 }
 
 func Test_Error_Malformed(t *testing.T) {
-	apiClient.Get("/echo").
+	apiClient.Post("/echo").
 		File("file", csvfile("malformed")).
 		Expect(t).
 		Status(http.StatusBadRequest).
@@ -48,7 +48,7 @@ func Test_Error_Malformed(t *testing.T) {
 }
 
 func Test_Echo(t *testing.T) {
-	apiClient.Get("/echo").
+	apiClient.Post("/echo").
 		File("file", csvfile("echo")).
 		Expect(t).
 		Status(http.StatusOK).
@@ -58,7 +58,7 @@ func Test_Echo(t *testing.T) {
 }
 
 func Test_Flatten(t *testing.T) {
-	apiClient.Get("/flatten").
+	apiClient.Post("/flatten").
 		File("file", csvfile("flatten")).
 		Expect(t).
 		Status(http.StatusOK).
@@ -68,7 +68,7 @@ func Test_Flatten(t *testing.T) {
 }
 
 func Test_Sum(t *testing.T) {
-	apiClient.Get("/sum").
+	apiClient.Post("/sum").
 		File("file", csvfile("sum")).
 		Expect(t).
 		Status(http.StatusOK).
@@ -78,7 +78,7 @@ func Test_Sum(t *testing.T) {
 }
 
 func Test_Error_Sum(t *testing.T) {
-	apiClient.Get("/sum").
+	apiClient.Post("/sum").
 		File("file", csvfile("error")).
 		Expect(t).
 		Status(http.StatusInternalServerError).
@@ -88,7 +88,7 @@ func Test_Error_Sum(t *testing.T) {
 }
 
 func Test_Invert(t *testing.T) {
-	apiClient.Get("/invert").
+	apiClient.Post("/invert").
 		File("file", csvfile("invert")).
 		Expect(t).
 		Status(http.StatusOK).
@@ -97,7 +97,7 @@ func Test_Invert(t *testing.T) {
 		Done()
 }
 func Test_MultiplyWithZero(t *testing.T) {
-	apiClient.Get("/multiply").
+	apiClient.Post("/multiply").
 		File("file", csvfile("multiply_zero")).
 		Expect(t).
 		Status(http.StatusOK).
@@ -107,7 +107,7 @@ func Test_MultiplyWithZero(t *testing.T) {
 }
 
 func Test_Multiply(t *testing.T) {
-	apiClient.Get("/multiply").
+	apiClient.Post("/multiply").
 		File("file", csvfile("multiply")).
 		Expect(t).
 		Status(http.StatusOK).
@@ -117,7 +117,7 @@ func Test_Multiply(t *testing.T) {
 }
 
 func Test_Error_Multiply(t *testing.T) {
-	apiClient.Get("/multiply").
+	apiClient.Post("/multiply").
 		File("file", csvfile("error")).
 		Expect(t).
 		Status(http.StatusInternalServerError).

@@ -8,7 +8,6 @@ import (
 )
 
 type Sum struct {
-	BaseHandler
 	service services.SumService
 	log     hclog.Logger
 }
@@ -19,7 +18,7 @@ func NewSum(log hclog.Logger, service services.SumService) *Sum {
 
 func (s *Sum) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Add("Content-Type", "text/plain")
-	records, err := s.getFieldFromForm("file", s.log, r)
+	records, err := getFieldFromForm("file", s.log, r)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return

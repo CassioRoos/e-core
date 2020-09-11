@@ -8,7 +8,6 @@ import (
 )
 
 type Invert struct {
-	BaseHandler
 	log     hclog.Logger
 	service services.InvertService
 }
@@ -19,7 +18,7 @@ func NewInvert(log hclog.Logger, service services.InvertService) *Invert {
 
 func (t *Invert) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Add("Content-Type", "text/plain")
-	records, err := t.getFieldFromForm("file", t.log, r)
+	records, err := getFieldFromForm("file", t.log, r)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
