@@ -11,12 +11,12 @@ func NewMultiplyService() MultiplyService {
 	return &multiply{}
 }
 
-func (m *multiply) Action(j, i int64)int64{
+func (m *multiply) action(j, i int64)int64{
 	total := j * i
 	return total
 }
 
 
 func (m *multiply) GetMultiplication(records [][]string) (int64, error) {
-	return processInt64(records,1, m)
+	return processInt64(records,1, m.action)
 }

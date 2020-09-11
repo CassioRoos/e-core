@@ -11,12 +11,12 @@ func NewSumService() SumService {
 	return &sum{}
 }
 
-func (s *sum) Action(j, i int64)int64{
+func (s *sum) action(j, i int64)int64{
 	total := j + i
 	return total
 }
 
 
 func (s *sum) GetSum(records [][]string) (int64,error) {
-	return processInt64(records,0, s)
+	return processInt64(records,0, s.action)
 }
