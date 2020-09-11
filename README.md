@@ -18,7 +18,7 @@
 
 ###### It`s necessary to be at the root of the project.
 
-Using docker-compose. 
+Using docker-compose
 
 ```bash
 docker-compose -f docker/docker-compose.yml up --build
