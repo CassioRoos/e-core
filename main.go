@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/CassioRoos/e-core/handlers"
 	"github.com/hashicorp/go-hclog"
 	"github.com/nicholasjackson/env"
 	"net/http"
+	"os"
+	"os/signal"
 	"time"
 )
 
@@ -25,7 +28,6 @@ func main() {
 		Level:      hclog.LevelFromString("DEBUG"),
 	})
 
-
 	server := http.Server{
 		Addr:         *port,              // configure the bind address
 		Handler:      handlers.ServerMux, // set the default handler
@@ -34,6 +36,25 @@ func main() {
 		IdleTimeout:  120 * time.Second,  // max time for connections using TCP Keep-Alive
 	}
 	// Showing the user the where is running and how to stop it
-	log.Info(fmt.Sprintf("Listening to port %s. Press CTRL + C to stop it.", *port))
-	server.ListenAndServe()
+	go func() {
+		log.Info(fmt.Sprintf("Listening to port %s. Press CTRL + C to stop it.", *port))
+		if err := server.ListenAndServe(); err != nil {
+			log.Error(fmt.Sprintf("Error while listening to port %s", *port))
+			os.Exit(1)
+		}
+	}()
+
+	sigChan := make(chan os.Signal, 1)
+
+	signal.Notify(sigChan, os.Kill)
+	signal.Notify(sigChan, os.Interrupt)
+
+	//BLOCKING WILL WAIT UNTIL THE SIGNAL COMES
+	sig := <- sigChan
+	log.Info("Shutdown gracefully", sig)
+	// get the general context to create a new
+	ct, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	// gracefully shutdown the server, waiting max 30 seconds for current operations to complete
+	server.Shutdown(ct)
 }
+
